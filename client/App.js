@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import Auth from "./Auth/Auth";
 import Home from "./Screens/Home";
-import Profile from "./Screens/Profile";
 
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
@@ -43,18 +42,6 @@ export default function App() {
             <Home userId={userId} userAuth={userAuth} {...props}>
               Home
             </Home>
-          )}
-        </Stack.Screen>
-        <Stack.Screen
-          name="Profile"
-          options={{
-            headerShown: false,
-          }}
-        >
-          {(props) => (
-            <Profile userId={userId} userAuth={userAuth} {...props}>
-              Profile
-            </Profile>
           )}
         </Stack.Screen>
       </Stack.Navigator>

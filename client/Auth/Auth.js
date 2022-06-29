@@ -11,7 +11,6 @@ const Auth = (props) => {
 
   const register = () => {
     createUserWithEmailAndPassword(props.userAuth, email, password);
-    setIsNewUser(true);
   };
 
   const login = () => {
@@ -20,9 +19,7 @@ const Auth = (props) => {
 
   useEffect(() => {
     console.log("the thing ====>", props.userId);
-    if (props.userId !== "" && isNewUser === true) {
-      props.navigation.navigate("Profile");
-    } else {
+    if (props.userId !== "") {
       props.navigation.navigate("Home");
     }
   }, [props.userId]);
@@ -53,5 +50,8 @@ const styles = StyleSheet.create({
 
   input: {
     borderWidth: 1,
+    width: 300,
+    height: 40,
+    marginBottom: 10,
   },
 });
