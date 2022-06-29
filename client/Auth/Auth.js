@@ -8,7 +8,6 @@ import {
 const Auth = (props) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [isNewUser, setIsNewUser] = useState(false);
 
   const register = () => {
     createUserWithEmailAndPassword(props.userAuth, email, password);

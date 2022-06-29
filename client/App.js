@@ -32,6 +32,7 @@ export default function App() {
             </Auth>
           )}
         </Stack.Screen>
+
         <Stack.Screen
           name="Home"
           options={{
