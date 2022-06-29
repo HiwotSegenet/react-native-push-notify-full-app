@@ -50,5 +50,8 @@ const styles = StyleSheet.create({
 
   input: {
     borderWidth: 1,
+    width: 300,
+    height: 40,
+    marginBottom: 10,
   },
 });
