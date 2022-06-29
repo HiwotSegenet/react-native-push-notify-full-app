@@ -8,10 +8,11 @@ import {
 const Auth = (props) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-
+  const [isNewUser, setIsNewUser] = useState(false);
 
   const register = () => {
     createUserWithEmailAndPassword(props.userAuth, email, password);
+    setIsNewUser(true);
   };
 
   const login = () => {
@@ -20,21 +21,23 @@ const Auth = (props) => {
 
   useEffect(() => {
     console.log("the thing ====>", props.userId);
-    if (props.userId !== "") {
+    if (props.userId !== "" && isNewUser === true) {
+      props.navigation.navigate("Profile");
+    } else {
       props.navigation.navigate("Home");
     }
   }, [props.userId]);
 
   return (
     <View style={styles.container}>
-        <TextInput style={styles.input} onChangeText={setEmail} value={email} />
-         <TextInput
-            style={styles.input}
-            onChangeText={setPassword}
-            value={password}
-          />
-        <Button onPress={login} title="Login" /> 
-        <Button onPress={register} title="Register" />
+      <TextInput style={styles.input} onChangeText={setEmail} value={email} />
+      <TextInput
+        style={styles.input}
+        onChangeText={setPassword}
+        value={password}
+      />
+      <Button onPress={login} title="Login" />
+      <Button onPress={register} title="Register" />
     </View>
   );
 };

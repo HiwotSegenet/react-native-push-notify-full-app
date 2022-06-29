@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import { StyleSheet, Text, View, Button } from "react-native";
 import { getDatabase, ref } from "firebase/database";
 
-
 const Home = (props) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -10,7 +9,7 @@ const Home = (props) => {
   const db = getDatabase();
   const profileRef = ref(db, "profiles/" + props.userId);
 
-  const user = props.userAuth.currentUser
+  const user = props.userAuth.currentUser;
 
   const signout = () => {
     props.userAuth.signOut();
@@ -24,6 +23,10 @@ const Home = (props) => {
   return (
     <View style={styles.container}>
       <Text> Hello from Home</Text>
+      <Button
+        title="Profile"
+        onPress={() => props.navigation.navigate("Profile")}
+      />
       <Button onPress={signout} title="Sign Out" />
     </View>
   );
