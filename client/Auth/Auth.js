@@ -9,7 +9,6 @@ const Auth = (props) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-
   const register = () => {
     createUserWithEmailAndPassword(props.userAuth, email, password);
   };
@@ -27,14 +26,14 @@ const Auth = (props) => {
 
   return (
     <View style={styles.container}>
-        <TextInput style={styles.input} onChangeText={setEmail} value={email} />
-         <TextInput
-            style={styles.input}
-            onChangeText={setPassword}
-            value={password}
-          />
-        <Button onPress={login} title="Login" /> 
-        <Button onPress={register} title="Register" />
+      <TextInput style={styles.input} onChangeText={setEmail} value={email} />
+      <TextInput
+        style={styles.input}
+        onChangeText={setPassword}
+        value={password}
+      />
+      <Button onPress={login} title="Login" />
+      <Button onPress={register} title="Register" />
     </View>
   );
 };
