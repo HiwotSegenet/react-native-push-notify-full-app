@@ -1,8 +1,19 @@
 import React, { useState, useEffect, useRef } from "react";
-import { StyleSheet, TextInput, Text, View, Button } from "react-native";
-import { getDatabase, ref, update } from "firebase/database";
+import {
+  StyleSheet,
+  TextInput,
+  FlatList,
+  Text,
+  View,
+  Button,
+  TouchableOpacity,
+  SafeAreaView,
+  StatusBar,
+} from "react-native";
+import { getDatabase, ref, update, onValue, set } from "firebase/database";
 import { getAuth, updateProfile, deleteUser } from "firebase/auth";
 import * as Device from "expo-device";
+import axios from "axios";
 import * as Notifications from "expo-notifications";
 
 Notifications.setNotificationHandler({
@@ -13,20 +24,30 @@ Notifications.setNotificationHandler({
   }),
 });
 
+// const Item = ({ name }) => (
+//   <View key={index}>
+//     <Text>{name}</Text>
+//   </View>
+// );
+
 const Home = (props) => {
   const auth = getAuth();
   const user = auth.currentUser;
   const [profiledata, setProfileData] = useState({
     name: user ? user.providerData[0].displayName : "",
   });
+  const [inputText, setInputText] = useState("");
   const [expoPushToken, setExpoPushToken] = useState("");
   const [notification, setNotification] = useState(false);
   const notificationListener = useRef();
   const responseListener = useRef();
+  const [allUsers, setAllUsers] = useState([]);
+  const [allUsersTokens, setAllUsersTokens] = useState([]);
 
   const db = getDatabase();
 
   const profileRef = ref(db, "profiles/" + props.userId);
+  const allProfilesRef = ref(db, "profiles/");
 
   useEffect(() => {
     update(profileRef, {
@@ -38,27 +59,27 @@ const Home = (props) => {
     registerForPushNotificationsAsync().then((token) =>
       setExpoPushToken(token)
     );
-
-    // This listener is fired whenever a notification is received while the app is foregrounded
-    notificationListener.current =
-      Notifications.addNotificationReceivedListener((notification) => {
-        setNotification(notification);
-      });
-
-    // This listener is fired whenever a user taps on or interacts with a notification (works when app is foregrounded, backgrounded, or killed)
-    responseListener.current =
-      Notifications.addNotificationResponseReceivedListener((response) => {
-        console.log(response);
-      });
-
-    return () => {
-      Notifications.removeNotificationSubscription(
-        notificationListener.current
-      );
-      Notifications.removeNotificationSubscription(responseListener.current);
-    };
   }, []);
 
+  useEffect(() => {
+    return onValue(allProfilesRef, (snapshot) => {
+      if (snapshot.val() !== null) {
+        const data = snapshot.val();
+        let result = Object.keys(data).map((key) => data[key]);
+
+        // let allUsers = [];
+        // let userTokens = [];
+        setAllUsers(result);
+        // result.map((item) => {
+        //   allUsers.push(item.name);
+        //   userTokens.push(item.token);
+        // });
+
+        // setAllUsers(allUsers);
+        // setAllUsersTokens(userTokens);
+      }
+    });
+  });
   const signout = () => {
     props.userAuth.signOut();
   };
@@ -127,7 +148,7 @@ const Home = (props) => {
       data: { someData: "goes here" },
     };
 
-    await fetch("https://exp.host/--/api/v2/push/send", {
+    await fetch("http://localhost:5050/notify/notification", {
       method: "POST",
       headers: {
         Accept: "application/json",
@@ -138,10 +159,11 @@ const Home = (props) => {
     });
   }
 
-  return (
-    <View style={styles.container}>
-      <Text> Hello from Home</Text>
+  // const renderItem = ({ item }) => <Item name={item.name} />;
 
+  return (
+    <SafeAreaView style={styles.container}>
+      <Text> Hello from Home</Text>
       <TextInput
         placeholder="Name"
         style={styles.input}
@@ -149,25 +171,20 @@ const Home = (props) => {
         onBlur={() => onSubmit()}
         value={profiledata.name === null ? "" : profiledata.name}
       />
-      <View style={{ alignItems: "center", justifyContent: "center" }}>
-        <Text>
-          Title: {notification && notification.request.content.title}{" "}
-        </Text>
-        <Text>Body: {notification && notification.request.content.body}</Text>
-        <Text>
-          Data:{" "}
-          {notification && JSON.stringify(notification.request.content.data)}
-        </Text>
-      </View>
-      <Button
-        title="Press to Send Notification"
-        onPress={async () => {
-          await sendPushNotification(expoPushToken);
-        }}
-      />
-
       <Button onPress={signout} title="Sign Out" />
-    </View>
+      <View>
+        <FlatList
+          data={allUsers}
+          renderItem={({ item, index }) => (
+            //  console.log({ item })
+
+            <View key={index} style={styles.fList}>
+              <Text style={styles.nameText}>{item.name}</Text>
+            </View>
+          )}
+        />
+      </View>
+    </SafeAreaView>
   );
 };
 
@@ -176,12 +193,11 @@ export default Home;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fff",
-    alignItems: "center",
-    justifyContent: "center",
+    marginTop: StatusBar.currentHeight || 0,
   },
   input: {
     flexDirection: "row",
+    // marginTop: -6,
     padding: 19,
     borderColor: "#ADB3BC",
     color: "#ADB3BC",
@@ -189,5 +205,16 @@ const styles = StyleSheet.create({
     textAlign: "left",
     width: 350,
     borderBottomWidth: 2,
+  },
+  fList: {
+    backgroundColor: "#f9c2ff",
+    padding: 20,
+    marginVertical: 8,
+    marginHorizontal: 16,
+  },
+  nameText: {
+    color: "#000",
+    fontSize: 32,
+    textAlign: "center",
   },
 });
