@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect } from "react";
 import {
   StyleSheet,
   TextInput,
@@ -11,8 +11,8 @@ import {
   StatusBar,
   Platform,
 } from "react-native";
-import { getDatabase, ref, update, onValue, set } from "firebase/database";
-import { getAuth, updateProfile, deleteUser } from "firebase/auth";
+import { getDatabase, ref, update, onValue } from "firebase/database";
+import { getAuth, updateProfile } from "firebase/auth";
 import * as Device from "expo-device";
 import axios from "axios";
 import * as Notifications from "expo-notifications";
@@ -25,12 +25,6 @@ Notifications.setNotificationHandler({
   }),
 });
 
-// const Item = ({ name }) => (
-//   <View key={index}>
-//     <Text>{name}</Text>
-//   </View>
-// );
-
 const Home = (props) => {
   const auth = getAuth();
   const user = auth.currentUser;
@@ -39,16 +33,9 @@ const Home = (props) => {
   });
   const [inputText, setInputText] = useState("");
   const [inputTitle, setTitleText] = useState("");
-
   const [expoPushToken, setExpoPushToken] = useState("");
-  const [notification, setNotification] = useState(false);
-  const notificationListener = useRef();
-  const responseListener = useRef();
   const [allUsers, setAllUsers] = useState([]);
-  const [allUsersTokens, setAllUsersTokens] = useState([]);
-
   const db = getDatabase();
-
   const profileRef = ref(db, "profiles/" + props.userId);
   const allProfilesRef = ref(db, "profiles/");
 
@@ -70,45 +57,20 @@ const Home = (props) => {
         const data = snapshot.val();
         let result = Object.keys(data).map((key) => data[key]);
 
-        // let allUsers = [];
-        // let userTokens = [];
         setAllUsers(result);
-        // result.map((item) => {
-        //   allUsers.push(item.name);
-        //   userTokens.push(item.token);
-        // });
-
-        // setAllUsers(allUsers);
-        // setAllUsersTokens(userTokens);
       }
     });
   });
   const signout = () => {
     props.userAuth.signOut();
   };
-  const onChangeText = (text, field) => {
-    setProfileData({ ...profiledata, [field]: text });
-  };
-  const onSubmit = () => {
-    updateProfile(user, {
-      displayName: profiledata.name,
-    })
-      .then(() => {
-        console.log("successfully saved");
-        console.log(user.providerData[0]);
-      })
-      .catch((error) => {
-        console.log("error ==>", error);
-      });
-    update(profileRef, {
-      name: profiledata.name,
-    });
-  };
+  //
   useEffect(() => {
     if (props.userId === "") {
       props.navigation.navigate("Auth");
     }
   }, [props.userId]);
+  //register for push notification
   async function registerForPushNotificationsAsync() {
     let token;
     if (Device.isDevice) {
@@ -140,43 +102,11 @@ const Home = (props) => {
 
     return token;
   }
-  // const pushToken = allUsers[2].token;
-  // console.log(pushToken);
-  // Can use this function below, OR use Expo's Push Notification Tool-> https://expo.dev/notifications
-  async function sendPushNotification(pushToken) {
-    console.log(pushToken);
-    const message = {
-      to: pushToken,
-      sound: "default",
-      title: inputTitle,
-      body: inputText,
-      data: { someData: "goes here" },
-    };
-    // "https://exp.host/--/api/v2/push/send"
-    // "http://localhost:5050/notify/notification"
-    await fetch("http://localhost:5050/notify/notification", {
-      method: "POST",
-      headers: {
-        Accept: "application/json",
-        "Accept-encoding": "gzip, deflate",
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(message),
-    });
-  }
-
-  // const renderItem = ({ item }) => <Item name={item.name} />;
 
   return (
     <SafeAreaView style={styles.container}>
       <Text> Hello from Home</Text>
-      {/* <TextInput
-        placeholder="Name"
-        style={styles.input}
-        onChangeText={(str) => onChangeText(str, "name")}
-        onBlur={() => onSubmit()}
-        value={profiledata.name === null ? "" : profiledata.name}
-      /> */}
+
       <TextInput
         style={styles.input}
         placeholder={"Title here"}
@@ -198,12 +128,11 @@ const Home = (props) => {
 
             <TouchableOpacity
               onPress={async () => {
-                // await sendPushNotification(item.token);
                 let UrlString = "localhost";
                 if (Platform.OS == "android" || Platform.OS == "ios") {
                   UrlString = "192.168.1.185";
                 }
-                // ${UrlString}
+
                 try {
                   await fetch(`http://${UrlString}:5050/notify/notification`, {
                     method: "POST",
