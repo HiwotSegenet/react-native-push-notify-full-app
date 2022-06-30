@@ -28,7 +28,7 @@ module.exports = {
       to: pushNotificationToken,
       data: { extraData: "Some data" },
       title: req.body.title,
-      body: req.body.text,
+      body: req.body.body,
     };
 
     messages.push(message);

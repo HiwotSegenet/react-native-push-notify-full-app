@@ -152,6 +152,8 @@ const Home = (props) => {
 
             <TouchableOpacity
               onPress={async () => {
+                console.log(inputText);
+
                 let UrlString = "localhost";
                 if (Platform.OS == "android" || Platform.OS == "ios") {
                   UrlString = "192.168.1.185";
@@ -166,8 +168,9 @@ const Home = (props) => {
                       "Content-Type": "application/json",
                     },
                     body: JSON.stringify({
-                      title: inputTitle,
                       token: item.token,
+                      title: inputTitle,
+
                       body: inputText,
                     }),
                   });
@@ -192,7 +195,7 @@ export default Home;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    marginTop: StatusBar.currentHeight || 0,
+    // marginTop: StatusBar.currentHeight || 0,
   },
   input: {
     flexDirection: "row",
