@@ -64,6 +64,24 @@ const Home = (props) => {
   const signout = () => {
     props.userAuth.signOut();
   };
+  const onChangeText = (text, field) => {
+    setProfileData({ ...profiledata, [field]: text });
+  };
+  const onSubmit = () => {
+    updateProfile(user, {
+      displayName: profiledata.name,
+    })
+      .then(() => {
+        console.log("successfully saved");
+        console.log(user.providerData[0]);
+      })
+      .catch((error) => {
+        console.log("error ==>", error);
+      });
+    update(profileRef, {
+      name: profiledata.name,
+    });
+  };
   //
   useEffect(() => {
     if (props.userId === "") {
@@ -106,7 +124,13 @@ const Home = (props) => {
   return (
     <SafeAreaView style={styles.container}>
       <Text> Hello from Home</Text>
-
+      <TextInput
+        placeholder="Name"
+        style={styles.input}
+        onChangeText={(str) => onChangeText(str, "name")}
+        onBlur={() => onSubmit()}
+        value={profiledata.name === null ? "" : profiledata.name}
+      />
       <TextInput
         style={styles.input}
         placeholder={"Title here"}
