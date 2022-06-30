@@ -3,6 +3,7 @@ const { Expo } = require("expo-server-sdk");
 let expo = new Expo();
 module.exports = {
   testNotify: async (req, res) => {
+    
     // Expo stuff goes in here. You should be able to test it by
     // hitting the route "http://localhost:5000/notify/notification"
 

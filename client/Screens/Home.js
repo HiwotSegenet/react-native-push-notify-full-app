@@ -201,7 +201,7 @@ const Home = (props) => {
                 // await sendPushNotification(item.token);
                 let UrlString = "localhost";
                 if (Platform.OS == "android" || Platform.OS == "ios") {
-                  UrlString = "192.168.1.185";
+                  UrlString = "192.168.1.248";
                 }
                 // ${UrlString}
                 try {
