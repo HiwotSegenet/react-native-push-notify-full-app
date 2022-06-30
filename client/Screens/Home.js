@@ -200,9 +200,10 @@ const Home = (props) => {
               onPress={async () => {
                 // await sendPushNotification(item.token);
                 let UrlString = "localhost";
-                if (Platform.OS == "android") {
-                  UrlString = "10.0.2.2";
+                if (Platform.OS == "android" || Platform.OS == "ios") {
+                  UrlString = "192.168.1.185";
                 }
+                // ${UrlString}
                 try {
                   await fetch(`http://${UrlString}:5050/notify/notification`, {
                     method: "POST",
