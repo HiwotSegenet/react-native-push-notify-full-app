@@ -9,6 +9,7 @@ import {
   TouchableOpacity,
   SafeAreaView,
   StatusBar,
+  Platform,
 } from "react-native";
 import { getDatabase, ref, update, onValue, set } from "firebase/database";
 import { getAuth, updateProfile, deleteUser } from "firebase/auth";
@@ -37,6 +38,8 @@ const Home = (props) => {
     name: user ? user.providerData[0].displayName : "",
   });
   const [inputText, setInputText] = useState("");
+  const [inputTitle, setTitleText] = useState("");
+
   const [expoPushToken, setExpoPushToken] = useState("");
   const [notification, setNotification] = useState(false);
   const notificationListener = useRef();
@@ -137,17 +140,20 @@ const Home = (props) => {
 
     return token;
   }
-
+  // const pushToken = allUsers[2].token;
+  // console.log(pushToken);
   // Can use this function below, OR use Expo's Push Notification Tool-> https://expo.dev/notifications
-  async function sendPushNotification(expoPushToken) {
+  async function sendPushNotification(pushToken) {
+    console.log(pushToken);
     const message = {
-      to: expoPushToken,
+      to: pushToken,
       sound: "default",
-      title: "Original Title",
-      body: "And here is the body!",
+      title: inputTitle,
+      body: inputText,
       data: { someData: "goes here" },
     };
-
+    // "https://exp.host/--/api/v2/push/send"
+    // "http://localhost:5050/notify/notification"
     await fetch("http://localhost:5050/notify/notification", {
       method: "POST",
       headers: {
@@ -164,12 +170,24 @@ const Home = (props) => {
   return (
     <SafeAreaView style={styles.container}>
       <Text> Hello from Home</Text>
-      <TextInput
+      {/* <TextInput
         placeholder="Name"
         style={styles.input}
         onChangeText={(str) => onChangeText(str, "name")}
         onBlur={() => onSubmit()}
         value={profiledata.name === null ? "" : profiledata.name}
+      /> */}
+      <TextInput
+        style={styles.input}
+        placeholder={"Title here"}
+        value={inputTitle}
+        onChangeText={(text) => setTitleText(text)}
+      />
+      <TextInput
+        style={styles.input}
+        placeholder={"Text here"}
+        value={inputText}
+        onChangeText={(text) => setInputText(text)}
       />
       <Button onPress={signout} title="Sign Out" />
       <View>
@@ -178,9 +196,36 @@ const Home = (props) => {
           renderItem={({ item, index }) => (
             //  console.log({ item })
 
-            <View key={index} style={styles.fList}>
+            <TouchableOpacity
+              onPress={async () => {
+                // await sendPushNotification(item.token);
+                let UrlString = "localhost";
+                if (Platform.OS == "android") {
+                  UrlString = "10.0.2.2";
+                }
+                try {
+                  await fetch(`http://${UrlString}:5050/notify/notification`, {
+                    method: "POST",
+                    headers: {
+                      Accept: "application/json",
+                      "Accept-encoding": "gzip, deflate",
+                      "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({
+                      title: inputTitle,
+                      token: item.token,
+                      body: inputText,
+                    }),
+                  });
+                } catch (error) {
+                  console.log(error);
+                }
+              }}
+              key={index}
+              style={styles.fList}
+            >
               <Text style={styles.nameText}>{item.name}</Text>
-            </View>
+            </TouchableOpacity>
           )}
         />
       </View>
